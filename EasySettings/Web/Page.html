@@ -1,0 +1,51 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+</head>
+<body>
+    <h2>EasySettings</h2>
+    
+    
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+    <script src="//ajax.aspnetcdn.com/ajax/knockout/knockout-2.2.1.js"></script>
+    
+    <table>
+        <thead><td>Name</td><td>Value</td></thead>
+        <tbody data-bind="foreach: settings">
+            <tr>
+                <td data-bind="text: Name"></td>
+                <td><input data-bind="value: Value" /></td>
+            </tr>
+            <tr>
+                <td colspan="2" data-bind="text: Description"></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <button data-bind="click: save">Save</button>
+    
+    <script>
+        function SettingsViewModel(data) {
+            var self = this;
+            self.settings = data.Settings;
+            self.token = data.Token;
+
+            self.save = function() {
+                $.ajax(document.URL, {
+                    data: ko.toJSON({ settings: self.settings, token: self.token }),
+                    type: "post", contentType: "application/json",
+                    success: function(result) { console.log(result); },
+                    error: function (result) { alert('failed');
+                        console.error('fail');
+                    }
+                });
+            };
+        }
+        
+        ko.applyBindings(new SettingsViewModel({data}));
+    </script>
+</body>
+</html>
