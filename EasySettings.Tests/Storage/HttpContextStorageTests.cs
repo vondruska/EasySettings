@@ -20,7 +20,7 @@ namespace EasySettings.Tests.Storage
         {
             var context = new HttpContext(new HttpRequest(null, "http://tempuri.org", null), new HttpResponse(null));
 
-            var storage = new HttpContextStorage(context.Application);
+            var storage = new HttpContextStorage(new HttpApplicationStateWrapper(context.Application));
 
             Assert.AreEqual(false, storage.GetAllValues().Any());
             storage.SaveSetting("MyNewSetting", "true");

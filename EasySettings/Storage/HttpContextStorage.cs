@@ -12,30 +12,42 @@
     {
         private const string Prefix = "EasySetting";
 
-        readonly HttpApplicationState _state;
+        HttpApplicationStateBase _state;
 
-        public HttpContextStorage() : this(HttpContext.Current.Application)
+        public HttpContextStorage()
         {
         }
 
-        public HttpContextStorage(HttpApplicationState state)
+        public HttpContextStorage(HttpApplicationStateBase state)
         {
             _state = state;
+        }
+
+        protected HttpApplicationStateBase State
+        {
+            get
+            {
+                return _state ?? new HttpApplicationStateWrapper(HttpContext.Current.Application);
+            }
+            set
+            {
+                _state = value;
+            }
         }
         
         public void SaveSetting(string key, string value)
         {
-            _state[Prefix + "-" + key] = value;
+            State[Prefix + "-" + key] = value;
         }
 
         public string GetValue(string key)
         {
-            return (_state[Prefix + "-" + key] ?? "").ToString();
+            return (State[Prefix + "-" + key] ?? "").ToString();
         }
 
         public Dictionary<string, string> GetAllValues()
         {
-            return _state.AllKeys.Where(item => item.StartsWith(Prefix)).ToDictionary(item => item.Replace(Prefix + "-", ""), item => _state[item].ToString());
+            return State.AllKeys.Where(item => item.StartsWith(Prefix)).ToDictionary(item => item.Replace(Prefix + "-", ""), item => State[item].ToString());
         }
 
         public void Initialize()
