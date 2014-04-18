@@ -3,20 +3,15 @@
     using System;
     using System.ComponentModel;
 
-    internal static class Inflator
-    {
-        internal static T InflateSettings<T>()
-            where T : class
-        {
-            var cacheItem = Configuration.CacheProvider.GetObject();
-            if (cacheItem != null)
-            {
-                var returnItem = cacheItem as T;
-                if (returnItem != null) return returnItem;
-            }
+    using Storage;
 
+    public static class Inflator<T>
+        where T : class
+    {
+        public static T InflateSettings(IStorage storage)
+        {
             var theClass = Activator.CreateInstance<T>();
-            var storedValues = Configuration.PersistantSettingsProvider.GetAllValues();
+            var storedValues = storage.GetAllValues();
 
             foreach (var item in storedValues)
             {
@@ -27,9 +22,14 @@
                 var casted = foo.ConvertFromInvariantString(item.Value);
 
                 property.SetValue(theClass, casted);
-            }        
+            }
 
             return theClass;
+        }
+
+        public static T InflateSettings()
+        {
+            return InflateSettings(Configuration.PersistantSettingsProvider);
         }
     }
 }

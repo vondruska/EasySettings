@@ -12,19 +12,31 @@
     {
         private const string Prefix = "EasySetting";
 
+        readonly HttpContext _context;
+
+        public HttpSessionStorage() : this(HttpContext.Current)
+        {
+
+        }
+
+        public HttpSessionStorage(HttpContext context)
+        {
+            _context = context;
+        }
+
         public void SaveSetting(string key, object value)
         {
-            HttpContext.Current.Session[Prefix + "-" + key] = value;
+            _context.Session[Prefix + "-" + key] = value;
         }
 
         public object GetValue(string key)
         {
-            return HttpContext.Current.Session[Prefix + "-" + key];
+            return _context.Session[Prefix + "-" + key];
         }
 
         public Dictionary<string, string> GetAllValues()
         {
-            return HttpContext.Current.Session.Keys.Cast<string>().Where(item => item.StartsWith(Prefix)).ToDictionary(item => item.Replace(Prefix + "-", ""), item => HttpContext.Current.Session[item].ToString());
+            return _context.Session.Keys.Cast<string>().Where(item => item.StartsWith(Prefix)).ToDictionary(item => item.Replace(Prefix + "-", ""), item => HttpContext.Current.Session[item].ToString());
         }
 
         public void Initialize()

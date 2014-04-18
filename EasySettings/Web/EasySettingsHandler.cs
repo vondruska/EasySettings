@@ -9,11 +9,10 @@
     using System.Web;
     using System.Web.Routing;
     using System.Web.Script.Serialization;
-    using System.Web.SessionState;
 
     using Extensions;
 
-    class EasySettingsHandler : IRouteHandler, IHttpHandler, IReadOnlySessionState
+    class EasySettingsHandler : IRouteHandler, IHttpHandler
     {
         public bool IsReusable
         {
@@ -118,7 +117,7 @@
         private IEnumerable<SettingViewModel> GetSettings(HttpContext context)
         {
             var theClass = GetSettingsClass(context);
-            return theClass.GetType().GetProperties().Select(x => new SettingViewModel { Name = x.Name, Value = x.GetValue(theClass).ToString(), Description = GetDescription(x) }).ToList();
+            return theClass.GetType().GetProperties().Select(x => new SettingViewModel { Name = x.Name, Value = x.GetValue(theClass).ToString(), Description = x.GetDescription() }).ToList();
         }
 
         private object GetSettingsClass(HttpContext context)
@@ -139,11 +138,6 @@
                             select (BaseEasySettings)Activator.CreateInstance(t)).Single();
         }
 
-        private string GetDescription(PropertyInfo propertyInfo)
-        {
-            var attribute = propertyInfo.GetCustomAttribute<System.ComponentModel.DescriptionAttribute>();
-            if (attribute == null) return "";
-            else return attribute.Description;
-        }
+        
     }
 }

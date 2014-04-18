@@ -5,7 +5,7 @@
     {
         public static T Settings
         {
-            get { return Inflator.InflateSettings<T>(); }
+            get { return Inflator<T>.InflateSettings(); }
         }
     }
 }

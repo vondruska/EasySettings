@@ -41,10 +41,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Cache\HttpRuntimeCache.cs" />
-    <Compile Include="Cache\ICache.cs" />
-    <Compile Include="Cache\NoCache.cs" />
-    <Compile Include="Extensions\FormatWithExtensions.cs" />
+    <Compile Include="Extensions\StringExtensions.cs" />
+    <Compile Include="Extensions\PropertyInfoExtensions.cs" />
+    <Compile Include="Storage\LocalStorage.cs" />
     <Compile Include="Web\EasySettingsHandler.cs" />
     <Compile Include="Inflator.cs" />
     <Compile Include="Storage\HttpContextStorage.cs" />

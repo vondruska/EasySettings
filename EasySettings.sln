@@ -5,6 +5,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EasySettings", "EasySetting
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EasySettings.TheTest", "EasySettings.TheTest\EasySettings.TheTest.csproj", "{179F5943-BC4B-41F1-8619-75205C480F51}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EasySettings.Tests", "EasySettings.Tests\EasySettings.Tests.csproj", "{EB51D1EE-C51A-4683-99B3-9F718DCE4794}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -19,6 +21,10 @@ Global
 		{179F5943-BC4B-41F1-8619-75205C480F51}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{179F5943-BC4B-41F1-8619-75205C480F51}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{179F5943-BC4B-41F1-8619-75205C480F51}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EB51D1EE-C51A-4683-99B3-9F718DCE4794}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EB51D1EE-C51A-4683-99B3-9F718DCE4794}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EB51D1EE-C51A-4683-99B3-9F718DCE4794}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EB51D1EE-C51A-4683-99B3-9F718DCE4794}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
