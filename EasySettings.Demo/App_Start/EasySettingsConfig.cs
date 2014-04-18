@@ -1,8 +1,8 @@
 ﻿[assembly: WebActivatorEx.PreApplicationStartMethod(
-    typeof(EasySettings.TheTest.App_Start.EasySettingsConfig), "PreStart")]
+    typeof(EasySettings.Demo.App_Start.EasySettingsConfig), "PreStart")]
 
 
-namespace EasySettings.TheTest.App_Start
+namespace EasySettings.Demo.App_Start
 {
     public class EasySettingsConfig
     {

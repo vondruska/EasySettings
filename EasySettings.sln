@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EasySettings", "EasySettings\EasySettings.csproj", "{1257E99D-9B8A-4899-9E3D-04B2F4ADB6B5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EasySettings.TheTest", "EasySettings.TheTest\EasySettings.TheTest.csproj", "{179F5943-BC4B-41F1-8619-75205C480F51}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EasySettings.Demo", "EasySettings.Demo\EasySettings.Demo.csproj", "{179F5943-BC4B-41F1-8619-75205C480F51}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EasySettings.Tests", "EasySettings.Tests\EasySettings.Tests.csproj", "{EB51D1EE-C51A-4683-99B3-9F718DCE4794}"
 EndProject

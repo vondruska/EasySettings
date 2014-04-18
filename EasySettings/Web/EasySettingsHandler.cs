@@ -29,6 +29,8 @@
         {
             var outputStream = context.Response.Output;
 
+            var settingsClass = new SettingsClassHelper(context);
+
             if (context.Request.HttpMethod == "POST")
             {
                 var jsonString = String.Empty;
@@ -45,19 +47,12 @@
                 if (!ValidateCsrfToken(context, newJson.Token))
                     throw new HttpRequestValidationException("Token was missing, or invalid");
 
-                var settingsClass = GetSettingsClass(context);
-                
                 foreach (var item in newJson.Settings)
                 {
-                    var property = settingsClass.GetType().GetProperty(item.Name);
-                    if (property == null || !property.CanWrite) continue;
+                    if (settingsClass.IsValidValue(item.Name, item.Value))
+                        Configuration.PersistantSettingsProvider.SaveSetting(item.Name, item.Value);
 
-                    var typeConverter = TypeDescriptor.GetConverter(property.PropertyType);
-                    var casted = typeConverter.ConvertFromInvariantString(item.Value);
-
-                    property.SetValue(settingsClass, casted);
-
-                    Configuration.PersistantSettingsProvider.SaveSetting(item.Name, item.Value);
+                    //TODO: create return json array to tell which properties didn't save
                 }
             }
             else
@@ -72,7 +67,7 @@
                     if (stream == null)
                     {
                         throw new Exception(
-                            "The file \"{0}\" cannot be found as an embedded resource.".FormatWith(fileName));
+                            "The HTML file can't be found.".FormatWith(fileName));
                     }
 
                     using (var reader = new StreamReader(stream))
@@ -81,7 +76,7 @@
                     }
                 }
 
-                var model = new ViewModel { Settings = GetSettings(context), Token = CreateCsrfToken(context)};
+                var model = new ViewModel { Settings = InflateSettingsViewModel(settingsClass), Token = CreateCsrfToken(context) };
 
                 foreach (var item in Configuration.PersistantSettingsProvider.GetAllValues())
                 {
@@ -115,22 +110,15 @@
             return guid;
         }
 
-        private IEnumerable<SettingViewModel> GetSettings(HttpContext context)
-        {
-            return InflateSettingsViewModel(GetSettingsClass(context));
-        }
-
-        protected IEnumerable<SettingViewModel> InflateSettingsViewModel(object theClass)
+        protected IEnumerable<SettingViewModel> InflateSettingsViewModel(SettingsClassHelper helper)
         {
             return
-                theClass.GetType()
-                        .GetProperties()
-                        .Select(
+                helper.GetProperties().Select(
                             x =>
                                 new SettingViewModel
                                     {
                                         Name = x.Name,
-                                        Value = x.GetValue(theClass).ToString(),
+                                        Value = x.GetValue(helper.TheClass).ToString(),
                                         Description = x.GetDescription(),
                                         Type = DetermineSettingType(x),
                                         PossibleValues = DetermineSettingType(x) == SettingType.Enum ? Enum.GetNames(x.PropertyType) : null
@@ -144,24 +132,6 @@
             if (propertyInfo.PropertyType == typeof(bool)) return SettingType.Boolean;
             
             return SettingType.String;
-        }
-
-        private object GetSettingsClass(HttpContext context)
-        {
-            var type = context.ApplicationInstance.GetType();
-            while (type != null && type.Namespace == "ASP")
-            {
-                type = type.BaseType;
-            }
-
-            var assembly = type == null ? null : type.Assembly;
-
-            if (assembly == null) return null;
-
-
-            return (from t in assembly.GetTypes()
-                            where t.BaseType == (typeof(BaseEasySettings)) && t.GetConstructor(Type.EmptyTypes) != null
-                            select (BaseEasySettings)Activator.CreateInstance(t)).Single();
         }
 
         

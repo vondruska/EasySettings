@@ -43,6 +43,7 @@
   <ItemGroup>
     <Compile Include="Extensions\StringExtensions.cs" />
     <Compile Include="Extensions\PropertyInfoExtensions.cs" />
+    <Compile Include="SettingsClassHelper.cs" />
     <Compile Include="Storage\LocalStorage.cs" />
     <Compile Include="Web\EasySettingsHandler.cs" />
     <Compile Include="Inflator.cs" />

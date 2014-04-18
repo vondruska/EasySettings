@@ -4,7 +4,7 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 
-namespace EasySettings.TheTest.Controllers
+namespace EasySettings.Demo.Controllers
 {
     public class HomeController : Controller
     {
@@ -13,7 +13,7 @@ namespace EasySettings.TheTest.Controllers
 
         public ActionResult Index()
         {
-            return Content("It didn't blow up\n" + Current<MySettings>.Settings.MiniProfiler + "\n" + Current<MySettings>.Settings.MyTestEnum);
+            return Content("It didn't blow up\nMiniProfiler: " + Current<MySettings>.Settings.MiniProfiler + "\n" + Current<MySettings>.Settings.MyTestEnum + "\n\nVisit /settings.axd for settings page", "text");
         }
 
     }

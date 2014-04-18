@@ -1,4 +1,4 @@
-﻿namespace EasySettings.TheTest
+﻿namespace EasySettings.Demo
 {
     using System.ComponentModel;
 
