@@ -9,10 +9,11 @@
     using System.Web;
     using System.Web.Routing;
     using System.Web.Script.Serialization;
+    using System.Web.SessionState;
 
     using Extensions;
 
-    class EasySettingsHandler : IRouteHandler, IHttpHandler
+    public class EasySettingsHandler : IRouteHandler, IHttpHandler, IRequiresSessionState
     {
         public bool IsReusable
         {
@@ -30,11 +31,11 @@
 
             if (context.Request.HttpMethod == "POST")
             {
-                string jsonString = String.Empty;
+                var jsonString = String.Empty;
 
                 var jsonSerializer = new JavaScriptSerializer();
                 HttpContext.Current.Request.InputStream.Position = 0;
-                using (StreamReader inputStream = new StreamReader(HttpContext.Current.Request.InputStream))
+                using (var inputStream = new StreamReader(HttpContext.Current.Request.InputStream))
                 {
                     jsonString = inputStream.ReadToEnd();
                 }
@@ -51,8 +52,8 @@
                     var property = settingsClass.GetType().GetProperty(item.Name);
                     if (property == null || !property.CanWrite) continue;
 
-                    var foo = TypeDescriptor.GetConverter(property.PropertyType);
-                    var casted = foo.ConvertFromInvariantString(item.Value);
+                    var typeConverter = TypeDescriptor.GetConverter(property.PropertyType);
+                    var casted = typeConverter.ConvertFromInvariantString(item.Value);
 
                     property.SetValue(settingsClass, casted);
 
@@ -80,7 +81,7 @@
                     }
                 }
 
-                var model = new ViewModel { Settings = GetSettings(context), Token = CreateCsrfToken(context) };
+                var model = new ViewModel { Settings = GetSettings(context), Token = CreateCsrfToken(context)};
 
                 foreach (var item in Configuration.PersistantSettingsProvider.GetAllValues())
                 {
@@ -104,7 +105,7 @@
         private string CreateCsrfToken(HttpContext context)
         {
             var guid = Guid.NewGuid().ToString("N");
-            HttpCookie csrfCookie = new HttpCookie("easysettings-token")
+            var csrfCookie = new HttpCookie("easysettings-token")
             {
                 Value = guid,
                 HttpOnly = true
@@ -116,8 +117,33 @@
 
         private IEnumerable<SettingViewModel> GetSettings(HttpContext context)
         {
-            var theClass = GetSettingsClass(context);
-            return theClass.GetType().GetProperties().Select(x => new SettingViewModel { Name = x.Name, Value = x.GetValue(theClass).ToString(), Description = x.GetDescription() }).ToList();
+            return InflateSettingsViewModel(GetSettingsClass(context));
+        }
+
+        protected IEnumerable<SettingViewModel> InflateSettingsViewModel(object theClass)
+        {
+            return
+                theClass.GetType()
+                        .GetProperties()
+                        .Select(
+                            x =>
+                                new SettingViewModel
+                                    {
+                                        Name = x.Name,
+                                        Value = x.GetValue(theClass).ToString(),
+                                        Description = x.GetDescription(),
+                                        Type = DetermineSettingType(x),
+                                        PossibleValues = DetermineSettingType(x) == SettingType.Enum ? Enum.GetNames(x.PropertyType) : null
+                                    })
+                        .ToList();
+        }
+
+        protected SettingType DetermineSettingType(PropertyInfo propertyInfo)
+        {
+            if (propertyInfo.PropertyType.IsEnum) return SettingType.Enum;
+            if (propertyInfo.PropertyType == typeof(bool)) return SettingType.Boolean;
+            
+            return SettingType.String;
         }
 
         private object GetSettingsClass(HttpContext context)

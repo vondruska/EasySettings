@@ -6,7 +6,7 @@
     {
         static Configuration()
         {
-            PersistantSettingsProvider = new HttpContextStorage();
+            PersistantSettingsProvider = new LocalStorage();
             Enabled = true;
         }
 

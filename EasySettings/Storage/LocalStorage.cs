@@ -16,7 +16,7 @@ namespace EasySettings.Storage
             _storage[key] = value;
         }
 
-        public object GetValue(string key)
+        public string GetValue(string key)
         {
             return _storage[key];
         }

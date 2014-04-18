@@ -36,6 +36,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.Web" />
   </ItemGroup>
   <Choose>
     <When Condition="('$(VisualStudioVersion)' == '10.0' or '$(VisualStudioVersion)' == '') and '$(TargetFrameworkVersion)' == 'v3.5'">
@@ -51,10 +52,12 @@
   </Choose>
   <ItemGroup>
     <Compile Include="ExtensionsTests.cs" />
+    <Compile Include="Storage\HttpContextStorageTests.cs" />
     <Compile Include="Storage\HttpSessionStorageTests.cs" />
     <Compile Include="TestSettings.cs" />
     <Compile Include="UnitTest1.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Web\Handler.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\EasySettings\EasySettings.csproj">

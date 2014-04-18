@@ -6,37 +6,48 @@
 
     /// <summary>
     /// Setting storage using session storage.
-    /// Suitable for short term, or user based settings. Settings will be lost when user loses session
+    /// Suitable for short term, or user based settings. Settings will be lost when user loses session.
     /// </summary>
-    class HttpSessionStorage
+    public class HttpSessionStorage : IStorage
     {
         private const string Prefix = "EasySetting";
 
-        readonly HttpContext _context;
+        HttpSessionStateBase _session;
 
-        public HttpSessionStorage() : this(HttpContext.Current)
+        public HttpSessionStorage()
         {
-
         }
 
-        public HttpSessionStorage(HttpContext context)
+        public HttpSessionStorage(HttpSessionStateBase session)
         {
-            _context = context;
+            _session = session;
         }
 
-        public void SaveSetting(string key, object value)
+        protected HttpSessionStateBase Session
         {
-            _context.Session[Prefix + "-" + key] = value;
+            get
+            {
+                return _session ?? new HttpSessionStateWrapper(HttpContext.Current.Session);
+            }
+            set
+            {
+                _session = value;
+            }
         }
 
-        public object GetValue(string key)
+        public void SaveSetting(string key, string value)
         {
-            return _context.Session[Prefix + "-" + key];
+            Session[Prefix + "-" + key] = value;
+        }
+
+        public string GetValue(string key)
+        {
+            return (Session[Prefix + "-" + key] ?? "").ToString();
         }
 
         public Dictionary<string, string> GetAllValues()
         {
-            return _context.Session.Keys.Cast<string>().Where(item => item.StartsWith(Prefix)).ToDictionary(item => item.Replace(Prefix + "-", ""), item => HttpContext.Current.Session[item].ToString());
+            return Session.Keys.Cast<string>().Where(item => item.StartsWith(Prefix)).ToDictionary(item => item.Replace(Prefix + "-", ""), item => Session[item].ToString());
         }
 
         public void Initialize()

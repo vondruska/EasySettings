@@ -27,6 +27,7 @@
         public SqlServerStorage(string connectionString)
         {
             ConnectionString = connectionString;
+            Initialize();
         }
 
         /// <summary>
@@ -47,7 +48,7 @@
             }
         }
 
-        public object GetValue(string key)
+        public string GetValue(string key)
         {
             using (var connection = GetOpenConnection())
             using (var command = new SqlCommand("SELECT [Value] FROM [" + TableName + "] WHERE Key = @Key", connection))
@@ -60,7 +61,7 @@
                     {
                         while (reader.Read())
                         {
-                            return reader.GetValue(0);
+                            return reader.GetString(0);
                         }
                     }
                     else return null;

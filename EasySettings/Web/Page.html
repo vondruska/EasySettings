@@ -3,49 +3,96 @@
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="utf-8" />
-    <title></title>
+    <title>EasySettings</title>
+    <style>
+            *, table { margin: 0;padding: 0;}
+            body { font-family: "Segoe UI", Verdana, Helvetica, Sans-Serif;font-size: .95em; }
+            #wrapper { width: 80%;min-width: 300px;max-width: 500px; margin: 0 auto;}
+            h2 { margin: 10px 0 20px 0; }
+            table {width: 100%}
+            table th { font-weight: bold;}
+            table td, table th { border-bottom: 1px solid #ccc;padding: 3px;margin: 0; border-spacing: 0;}
+            table tr:hover { background-color: #eee; }
+            label { font-weight: bold;}
+            span.desc { color: #aaa;font-size: .9em;}
+            td.value { text-align: center;}
+        </style>
 </head>
-<body>
-    <h2>EasySettings</h2>
-    
-    
-    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
-    <script src="//ajax.aspnetcdn.com/ajax/knockout/knockout-2.2.1.js"></script>
-    
-    <table>
-        <thead><td>Name</td><td>Value</td></thead>
-        <tbody data-bind="foreach: settings">
-            <tr>
-                <td data-bind="text: Name"></td>
-                <td><input data-bind="value: Value" /></td>
-            </tr>
-            <tr>
-                <td colspan="2" data-bind="text: Description"></td>
-            </tr>
-        </tbody>
-    </table>
-
-    <button data-bind="click: save">Save</button>
-    
-    <script>
-        function SettingsViewModel(data) {
-            var self = this;
-            self.settings = data.Settings;
-            self.token = data.Token;
-
-            self.save = function() {
-                $.ajax(document.URL, {
-                    data: ko.toJSON({ settings: self.settings, token: self.token }),
-                    type: "post", contentType: "application/json",
-                    success: function(result) { console.log(result); },
-                    error: function (result) { alert('failed');
-                        console.error('fail');
-                    }
-                });
-            };
-        }
+    <body>
+        <div id="wrapper">
+            <h2>The Settings</h2>
         
-        ko.applyBindings(new SettingsViewModel({data}));
-    </script>
-</body>
+        <table>
+            <thead><tr><th>Name</th><th>Value</th></tr></thead>
+            <tbody data-bind="foreach: settings.sort(function (l, r) { return l.name > r.name ? 1 : -1 })">
+                <tr>
+                    <td><label data-bind="text: name, attr: {for: name}"></label><br />
+                        <span class="desc" data-bind="text: desc"></span>
+                    </td>
+                    <td class="value">
+                        <!-- ko if: type === 0 -->
+                        <input data-bind="value: value, attr: {id: name}" />
+                        <!-- /ko -->
+                        <!-- ko if: type === 1 -->
+                        <input type="checkbox" data-bind="checked: value, attr: {id: name}" />
+                        <!-- /ko -->
+                        <!-- ko if: type === 2 -->
+                        <select data-bind="options: possibleValues, value: value, attr: {id: name}"></select>
+                        <!-- /ko -->
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <button data-bind="click: save">Save</button> <span id="message"></span>
+        </div>
+    
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+        <script src="//ajax.aspnetcdn.com/ajax/knockout/knockout-2.2.1.js"></script>
+        <script>
+            function Setting(data) {
+                var self = this;
+                self.type = data.Type;
+                self.name = data.Name;
+                if(self.type == 1)
+                    self.value = data.Value === 'True';
+                else
+                    self.value = data.Value;
+                self.desc = data.Description;
+                self.possibleValues = data.PossibleValues;
+
+            }
+            function SettingsViewModel(data) {
+                var self = this;
+                self.settings = ko.observableArray($.map(data.Settings, function (s) { return new Setting(s); }));
+                self.token = data.Token;
+
+                self.save = function() {
+                    $.ajax(document.URL, {
+                        data: ko.toJSON({ settings: self.settings, token: self.token }),
+                        type: "post", 
+                        contentType: "application/json",
+                        success: function(result) { $('#message').html('saved successfully!') },
+                        error: function () { $('#message').html('saving failed!') }
+                    });
+                };
+            }
+        
+            ko.applyBindings(new SettingsViewModel({data}));
+
+            $(function() {
+                $('input, select').on('change', function() {
+                    $('#message').html("changes not saved");
+                    window.onbeforeunload = function() {
+                        return "Your changes have not been saved.";
+                    };
+                });
+
+                $('button').on('click', function() {
+                    window.onbeforeunload = null;
+                    $('#message').html('saving');
+                });
+            });
+        </script>
+    </body>
 </html>

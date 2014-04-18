@@ -1,13 +1,8 @@
-﻿using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-
-namespace EasySettings.Tests
+﻿namespace EasySettings.Tests
 {
-    using System.Collections.Generic;
-
     using EasySettings.Storage;
 
-    using Storage;
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     [TestClass]
     public class UnitTests
@@ -20,7 +15,7 @@ namespace EasySettings.Tests
 
 
         [TestMethod]
-        public void EnsureStartup()
+        public void TestDefaultBehavior()
         {
             Assert.AreEqual(default(bool), Current<TestSettings>.Settings.BooleanValue);
             Assert.AreEqual(true, Current<TestSettings>.Settings.BooleanStartsTrue);
@@ -32,7 +27,7 @@ namespace EasySettings.Tests
         }
 
         [TestMethod]
-        public void SetSettingsDirectlyOnStorage()
+        public void TestSetSettingsDirectlyOnStorage()
         {
             Configuration.PersistantSettingsProvider.SaveSetting("BooleanValue", "true");
             Assert.AreEqual(true, bool.Parse(Configuration.PersistantSettingsProvider.GetValue("BooleanValue").ToString()));
@@ -49,8 +44,6 @@ namespace EasySettings.Tests
             Assert.AreEqual(default(int), inflator.IntegerValue);
             Assert.AreEqual(default(string), inflator.StringValue);
 
-            inflator = null;
-
             Configuration.PersistantSettingsProvider.SaveSetting("BooleanValue", "true");
             Configuration.PersistantSettingsProvider.SaveSetting("BooleanStartsTrue", "false");
             Configuration.PersistantSettingsProvider.SaveSetting("EnumValue", "FirstValue");
@@ -64,7 +57,18 @@ namespace EasySettings.Tests
             Assert.AreEqual(MySettingsEnum.FirstValue, inflator.EnumValue);
             Assert.AreEqual(1000, inflator.IntegerValue);
             Assert.AreEqual("Lipsum", inflator.StringValue);
+        }
 
+        [TestMethod]
+        public void TestDisabling()
+        {
+            Assert.AreEqual(true, Current<TestSettings>.Settings.BooleanStartsTrue);
+            
+            Configuration.Enabled = false;
+            
+            Configuration.PersistantSettingsProvider.SaveSetting("BooleanStartsTrue", "false");
+
+            Assert.AreEqual(true, Current<TestSettings>.Settings.BooleanStartsTrue);
         }
 
     }

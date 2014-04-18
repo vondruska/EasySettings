@@ -6,36 +6,36 @@
 
     /// <summary>
     /// Setting storage using the HttpContext of the current web server.
-    /// Sutiable for short term storage. Any modified settings will be reset on application recycle
+    /// Suitable for short term storage. Any modified settings will be reset on application recycle
     /// </summary>
     public class HttpContextStorage : IStorage
     {
         private const string Prefix = "EasySetting";
 
-        readonly HttpContext _context;
+        readonly HttpApplicationState _state;
 
-        public HttpContextStorage() : this(HttpContext.Current)
+        public HttpContextStorage() : this(HttpContext.Current.Application)
         {
         }
 
-        public HttpContextStorage(HttpContext context)
+        public HttpContextStorage(HttpApplicationState state)
         {
-            _context = context;
+            _state = state;
         }
         
         public void SaveSetting(string key, string value)
         {
-            _context.Application[Prefix + "-" + key] = value;
+            _state[Prefix + "-" + key] = value;
         }
 
-        public object GetValue(string key)
+        public string GetValue(string key)
         {
-            return _context.Application[Prefix + "-" + key];
+            return (_state[Prefix + "-" + key] ?? "").ToString();
         }
 
         public Dictionary<string, string> GetAllValues()
         {
-            return _context.Application.AllKeys.Where(item => item.StartsWith(Prefix)).ToDictionary(item => item.Replace(Prefix + "-", ""), item => HttpContext.Current.Application[item].ToString());
+            return _state.AllKeys.Where(item => item.StartsWith(Prefix)).ToDictionary(item => item.Replace(Prefix + "-", ""), item => _state[item].ToString());
         }
 
         public void Initialize()

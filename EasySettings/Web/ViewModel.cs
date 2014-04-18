@@ -8,11 +8,19 @@
         public IEnumerable<SettingViewModel> Settings { get; set; }
     }
 
-    internal class SettingViewModel
+    public class SettingViewModel
     {
         public string Name { get; set; }
         public string Value { get; set; }
         public string Description { get; set; }
-        public int Type { get; set; }
+        public SettingType Type { get; set; }
+        public string[] PossibleValues { get; set; }
+    }
+
+    public enum SettingType
+    {
+        String = 0,
+        Boolean = 1,
+        Enum = 2
     }
 }

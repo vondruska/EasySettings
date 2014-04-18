@@ -11,6 +11,10 @@
         public static T InflateSettings(IStorage storage)
         {
             var theClass = Activator.CreateInstance<T>();
+
+            // if we're disabled, return the class without looking at storage
+            if (!Configuration.Enabled) return theClass;
+
             var storedValues = storage.GetAllValues();
 
             foreach (var item in storedValues)
@@ -18,8 +22,8 @@
                 var property = theClass.GetType().GetProperty(item.Key);
                 if (property == null || !property.CanWrite) continue;
 
-                var foo = TypeDescriptor.GetConverter(property.PropertyType);
-                var casted = foo.ConvertFromInvariantString(item.Value);
+                var typeConverter = TypeDescriptor.GetConverter(property.PropertyType);
+                var casted = typeConverter.ConvertFromInvariantString(item.Value);
 
                 property.SetValue(theClass, casted);
             }

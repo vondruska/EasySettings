@@ -16,7 +16,7 @@
         /// </summary>
         /// <param name="key">The unique key</param>
         /// <returns>Object value</returns>
-        object GetValue(string key);
+        string GetValue(string key);
 
         /// <summary>
         /// Get all the settings from this provider

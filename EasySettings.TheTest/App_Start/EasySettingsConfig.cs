@@ -1,17 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
+﻿[assembly: WebActivatorEx.PreApplicationStartMethod(
+    typeof(EasySettings.TheTest.App_Start.EasySettingsConfig), "PreStart")]
 
-namespace TheTest.App_Start
+
+namespace EasySettings.TheTest.App_Start
 {
-    using EasySettings.Storage;
-
     public class EasySettingsConfig
     {
         public static void PreStart()
         {
-            EasySettings.Configuration.PersistantSettingsProvider = new HttpContextStorage();
+            Configuration.PersistantSettingsProvider = new Storage.SqlServerStorage("Data Source=(localdb)\\v11.0;Initial Catalog=exline-inc_com");
         }
     }
 }

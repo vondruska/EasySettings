@@ -15,6 +15,9 @@
         public bool MyTest { get; set; }
 
         public TestEnum MyTestEnum { get; set; }
+
+        [Description("This is an integer value with a really long description that should wrap eventually")]
+        public int IntegerValue { get; set; }
     }
 
     public enum TestEnum
