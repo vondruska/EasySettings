@@ -52,6 +52,9 @@
   </Choose>
   <ItemGroup>
     <Compile Include="ExtensionsTests.cs" />
+    <Compile Include="lib\HttpSimulator.cs" />
+    <Compile Include="lib\ReflectionHelper.cs" />
+    <Compile Include="lib\SimulatedHttpRequest.cs" />
     <Compile Include="Storage\HttpContextStorageTests.cs" />
     <Compile Include="Storage\HttpSessionStorageTests.cs" />
     <Compile Include="TestSettings.cs" />
