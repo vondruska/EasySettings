@@ -5,17 +5,17 @@
     using System.Linq;
     using System.Web;
 
-    using EasySettings.Storage;
+    using NUnit.Framework;
 
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using SettingsStorage;
 
-    [TestClass]
+    [TestFixture]
     public class HttpSessionStorageTests
     {
-        [TestMethod]
+        [Test]
         public void TestHttpSessionStorage()
         {
-            var storage = new HttpSessionStorage(new HttpSessionMock());
+            var storage = new HttpSessionSettingsStorage(new HttpSessionMock());
             Assert.AreEqual(false, storage.GetAllValues().Any());
             storage.SaveSetting("MyNewSetting", "true");
 

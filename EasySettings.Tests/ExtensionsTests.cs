@@ -4,12 +4,12 @@ namespace EasySettings.Tests
 {
     using Extensions;
 
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using NUnit.Framework;
 
-    [TestClass]
+    [TestFixture]
     public class ExtensionsTests
     {
-        [TestMethod]
+        [Test]
         public void TestPropertyInfo()
         {
             var properties = typeof(TestSettings).GetProperties();

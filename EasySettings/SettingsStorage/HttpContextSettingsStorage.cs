@@ -1,24 +1,24 @@
-﻿namespace EasySettings.Storage
+﻿namespace EasySettings.SettingsStorage
 {
     using System.Collections.Generic;
     using System.Linq;
     using System.Web;
 
     /// <summary>
-    /// Setting storage using the HttpContext of the current web server.
-    /// Suitable for short term storage. Any modified settings will be reset on application recycle
+    /// Setting settingsStorage using the HttpContext of the current web server.
+    /// Suitable for short term settingsStorage. Any modified settings will be reset on application recycle
     /// </summary>
-    public class HttpContextStorage : IStorage
+    public class HttpContextSettingsStorage : ISettingsStorage
     {
         private const string Prefix = "EasySetting";
 
         HttpApplicationStateBase _state;
 
-        public HttpContextStorage()
+        public HttpContextSettingsStorage()
         {
         }
 
-        public HttpContextStorage(HttpApplicationStateBase state)
+        public HttpContextSettingsStorage(HttpApplicationStateBase state)
         {
             _state = state;
         }

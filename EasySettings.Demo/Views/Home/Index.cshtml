@@ -1,0 +1,21 @@
+﻿@using EasySettings
+@using EasySettings.Demo
+@{
+    ViewBag.Title = "Index";
+}
+
+
+<h2>Static Accessing</h2>
+MiniProfiler: @(Settings.Current<MySettings>().MiniProfiler)<br />
+Integer Value: @(Settings.Current<MySettings>().IntegerValue)<br />
+MyTest Value: @(Settings.Current<MySettings>().MyTest)<br />
+MyTestEnum Value: @(Settings.Current<MySettings>().MyTestEnum)<br /><br />
+
+
+<h2>Dynamic Accessing</h2>
+MiniProfiler: @(Settings.Current().MiniProfiler)<br />
+Integer Value: @(Settings.Current().IntegerValue)<br />
+MyTest Value: @(Settings.Current().MyTest)<br />
+MyTestEnum Value: @(Settings.Current().MyTestEnum)<br /><br />
+
+<a href="/settings.axd">Access Settings Adjustment</a>

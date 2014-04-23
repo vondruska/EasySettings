@@ -8,19 +8,19 @@ namespace EasySettings.Tests.Storage
 {
     using System.Web;
 
-    using EasySettings.Storage;
+    using NUnit.Framework;
 
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using SettingsStorage;
 
-    [TestClass]
+    [TestFixture]
     public class HttpContextStorageTests
     {
-        [TestMethod]
+        [Test]
         public void TestHttpContextStorage()
         {
             var context = new HttpContext(new HttpRequest(null, "http://tempuri.org", null), new HttpResponse(null));
 
-            var storage = new HttpContextStorage(new HttpApplicationStateWrapper(context.Application));
+            var storage = new HttpContextSettingsStorage(new HttpApplicationStateWrapper(context.Application));
 
             Assert.AreEqual(false, storage.GetAllValues().Any());
             storage.SaveSetting("MyNewSetting", "true");

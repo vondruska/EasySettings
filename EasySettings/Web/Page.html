@@ -12,7 +12,8 @@
             table {width: 100%}
             table th { font-weight: bold;}
             table td, table th { border-bottom: 1px solid #ccc;padding: 3px;margin: 0; border-spacing: 0;}
-            table tr:hover { background-color: #eee; }
+            table th { border-bottom-color: #999; }
+            table tbody tr:hover { background-color: #eee; }
             label { font-weight: bold;}
             span.desc { color: #aaa;font-size: .9em;}
             td.value { text-align: center;}
@@ -54,10 +55,12 @@
                 var self = this;
                 self.type = data.Type;
                 self.name = data.Name;
+                
                 if(self.type == 1)
                     self.value = data.Value === 'True';
                 else
                     self.value = data.Value;
+                
                 self.desc = data.Description;
                 self.possibleValues = data.PossibleValues;
 

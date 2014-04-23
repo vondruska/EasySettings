@@ -13,7 +13,7 @@ namespace EasySettings.Demo.Controllers
 
         public ActionResult Index()
         {
-            return Content("It didn't blow up\nMiniProfiler: " + Current<MySettings>.Settings.MiniProfiler + "\n" + Current<MySettings>.Settings.MyTestEnum + "\n\nVisit /settings.axd for settings page", "text");
+            return View();
         }
 
     }

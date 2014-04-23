@@ -22,7 +22,7 @@ namespace Subtext.TestLibrary
 	/// <summary>
     /// Useful class for simulating the HttpContext. This does not actually 
     /// make an HttpRequest, it merely simulates the state that your code 
-    /// would be in "as if" handling a request. Thus the HttpContext.Current 
+    /// would be in "as if" handling a request. Thus the HttpContext.Settings 
     /// property is populated.
     /// </summary>
     public class HttpSimulator : IDisposable

@@ -1,8 +1,8 @@
-﻿namespace EasySettings.Storage
+﻿namespace EasySettings
 {
     using System.Collections.Generic;
 
-    public interface IStorage
+    public interface ISettingsStorage
     {
         /// <summary>
         /// Save a setting to storage

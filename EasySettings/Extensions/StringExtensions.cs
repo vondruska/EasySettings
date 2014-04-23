@@ -20,10 +20,11 @@
             if (format == null)
                 throw new ArgumentNullException("format");
 
-            Regex r = new Regex(@"(?<start>\{)+(?<property>[\w\.\[\]]+)(?<format>:[^}]+)?(?<end>\})+",
-              RegexOptions.Compiled | RegexOptions.CultureInvariant | RegexOptions.IgnoreCase);
+            Regex r = new Regex(
+                @"(?<start>\{)+(?<property>[\w\.\[\]]+)(?<format>:[^}]+)?(?<end>\})+",
+                RegexOptions.Compiled | RegexOptions.CultureInvariant | RegexOptions.IgnoreCase);
 
-            List<object> values = new List<object>();
+            var values = new List<object>();
             string rewrittenFormat = r.Replace(format, delegate(Match m)
             {
                 Group startGroup = m.Groups["start"];

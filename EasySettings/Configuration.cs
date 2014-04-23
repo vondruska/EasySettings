@@ -1,17 +1,19 @@
 ﻿namespace EasySettings
 {
-    using Storage;
+    using ObjectCaching;
+
+    using SettingsStorage;
 
     public static class Configuration
     {
         static Configuration()
         {
-            PersistantSettingsProvider = new LocalStorage();
-            Enabled = true;
+            SettingsProvider = new LocalSettingsStorage();
+            SettingsObjectCache = new StandardObjectCache();
         }
 
-        public static IStorage PersistantSettingsProvider { get; set; }
+        public static ISettingsStorage SettingsProvider { get; set; }
 
-        public static bool Enabled { get; set; }
+        internal static ISettingsObjectCache SettingsObjectCache { get; set; }
     }
 }

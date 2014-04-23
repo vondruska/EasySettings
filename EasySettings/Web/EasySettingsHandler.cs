@@ -1,10 +1,9 @@
 ﻿namespace EasySettings.Web
 {
     using System;
-    using System.ComponentModel;
-    using System.Linq;
     using System.Collections.Generic;
     using System.IO;
+    using System.Linq;
     using System.Reflection;
     using System.Web;
     using System.Web.Routing;
@@ -15,6 +14,8 @@
 
     public class EasySettingsHandler : IRouteHandler, IHttpHandler, IRequiresSessionState
     {
+        const string TokenCookieName = "easysettings-token";
+        
         public bool IsReusable
         {
             get { return true; }
@@ -31,86 +32,102 @@
 
             var settingsClass = new SettingsClassHelper(context);
 
-            if (context.Request.HttpMethod == "POST")
+
+            switch (context.Request.HttpMethod)
             {
-                var jsonString = String.Empty;
-
-                var jsonSerializer = new JavaScriptSerializer();
-                HttpContext.Current.Request.InputStream.Position = 0;
-                using (var inputStream = new StreamReader(HttpContext.Current.Request.InputStream))
-                {
-                    jsonString = inputStream.ReadToEnd();
-                }
-
-                var newJson = jsonSerializer.Deserialize<ViewModel>(jsonString);
-
-                if (!ValidateCsrfToken(context, newJson.Token))
-                    throw new HttpRequestValidationException("Token was missing, or invalid");
-
-                foreach (var item in newJson.Settings)
-                {
-                    if (settingsClass.IsValidValue(item.Name, item.Value))
-                        Configuration.PersistantSettingsProvider.SaveSetting(item.Name, item.Value);
-
-                    //TODO: create return json array to tell which properties didn't save
-                }
-            }
-            else
-            {
-                var assembly = Assembly.GetExecutingAssembly();
-
-                var fileName = "{0}.Page.html".FormatWith(GetType().Namespace);
-
-                string fileContent;
-                using (var stream = assembly.GetManifestResourceStream(fileName))
-                {
-                    if (stream == null)
-                    {
-                        throw new Exception(
-                            "The HTML file can't be found.".FormatWith(fileName));
-                    }
-
-                    using (var reader = new StreamReader(stream))
-                    {
-                        fileContent = reader.ReadToEnd();
-                    }
-                }
-
-                var model = new ViewModel { Settings = InflateSettingsViewModel(settingsClass), Token = CreateCsrfToken(context) };
-
-                foreach (var item in Configuration.PersistantSettingsProvider.GetAllValues())
-                {
-                    model.Settings.First(x => x.Name == item.Key).Value = item.Value;
-                }
-
-                var outputJson = new JavaScriptSerializer().Serialize(model);
-
-                fileContent = fileContent.Replace("{data}", outputJson);
-                outputStream.Write(fileContent);
+                case "POST":
+                    outputStream.Write(ProcessPost(context.Request.InputStream, settingsClass, context.Request.Cookies));
+                    break;
+                default:
+                    outputStream.Write(ProcessGet(settingsClass, context.Response.Cookies));
+                    break;
             }
         }
 
-        private bool ValidateCsrfToken(HttpContext context, string submittedToken)
+        internal string ProcessGet(SettingsClassHelper helper, HttpCookieCollection responseCookies)
         {
-            if (context.Request.Cookies["easysettings-token"] == null) return false;
+            var assembly = Assembly.GetExecutingAssembly();
 
-            return context.Request.Cookies["easysettings-token"].Value == submittedToken;
+            var fileName = "{0}.Page.html".FormatWith(GetType().Namespace);
+
+            string fileContent;
+            using (var stream = assembly.GetManifestResourceStream(fileName))
+            {
+                if (stream == null)
+                    throw new Exception("The UI can't be found.");
+
+                using (var reader = new StreamReader(stream))
+                    fileContent = reader.ReadToEnd();
+            }
+
+            var model = new ViewModel
+                {
+                    Settings = InflateSettingsViewModel(helper), 
+                    Token = CreateCsrfToken(responseCookies)
+                };
+
+            foreach (var item in Configuration.SettingsProvider.GetAllValues())
+            {
+                model.Settings.First(x => x.Name == item.Key).Value = item.Value;
+            }
+
+            var outputJson = new JavaScriptSerializer().Serialize(model);
+
+            fileContent = fileContent.Replace("{data}", outputJson);
+
+            return fileContent;
         }
 
-        private string CreateCsrfToken(HttpContext context)
+        internal string ProcessPost(Stream inputStream, SettingsClassHelper helper, HttpCookieCollection requestCookies)
+        {
+            string jsonString;
+
+            var jsonSerializer = new JavaScriptSerializer();
+            inputStream.Position = 0;
+            using (var stream = new StreamReader(inputStream))
+            {
+                jsonString = stream.ReadToEnd();
+            }
+
+            var newJson = jsonSerializer.Deserialize<ViewModel>(jsonString);
+
+            if (!ValidateCsrfToken(requestCookies, newJson.Token))
+                throw new HttpRequestValidationException("Token was missing, or invalid");
+
+            foreach (var item in newJson.Settings)
+            {
+                if (helper.IsValidValue(item.Name, item.Value))
+                {
+                    Configuration.SettingsProvider.SaveSetting(item.Name, item.Value);
+                }
+
+                //TODO: create return json array to tell which properties didn't save with invalid values
+            }
+
+            return "";
+        }
+
+        private bool ValidateCsrfToken(HttpCookieCollection cookies, string submittedToken)
+        {
+            if (cookies[TokenCookieName] == null) return false;
+
+            return cookies[TokenCookieName].Value == submittedToken;
+        }
+
+        private string CreateCsrfToken(HttpCookieCollection cookies)
         {
             var guid = Guid.NewGuid().ToString("N");
-            var csrfCookie = new HttpCookie("easysettings-token")
+            var csrfCookie = new HttpCookie(TokenCookieName)
             {
                 Value = guid,
                 HttpOnly = true
             };
-            context.Response.Cookies.Add(csrfCookie);
+            cookies.Add(csrfCookie);
 
             return guid;
         }
 
-        protected IEnumerable<SettingViewModel> InflateSettingsViewModel(SettingsClassHelper helper)
+        internal IEnumerable<SettingViewModel> InflateSettingsViewModel(SettingsClassHelper helper)
         {
             return
                 helper.GetProperties().Select(
@@ -118,7 +135,7 @@
                                 new SettingViewModel
                                     {
                                         Name = x.Name,
-                                        Value = x.GetValue(helper.TheClass).ToString(),
+                                        Value = (x.GetValue(helper.TheClass) ?? "").ToString(),
                                         Description = x.GetDescription(),
                                         Type = DetermineSettingType(x),
                                         PossibleValues = DetermineSettingType(x) == SettingType.Enum ? Enum.GetNames(x.PropertyType) : null
@@ -126,14 +143,12 @@
                         .ToList();
         }
 
-        protected SettingType DetermineSettingType(PropertyInfo propertyInfo)
+        private static SettingType DetermineSettingType(PropertyInfo propertyInfo)
         {
             if (propertyInfo.PropertyType.IsEnum) return SettingType.Enum;
             if (propertyInfo.PropertyType == typeof(bool)) return SettingType.Boolean;
             
             return SettingType.String;
         }
-
-        
     }
 }

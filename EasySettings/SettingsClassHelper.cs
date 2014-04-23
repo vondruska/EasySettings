@@ -1,27 +1,25 @@
-﻿using System;
-using System.Linq;
-
-namespace EasySettings
+﻿namespace EasySettings
 {
+    using System;
     using System.ComponentModel;
+    using System.Linq;
     using System.Reflection;
     using System.Web;
 
-    public class SettingsClassHelper
+    internal class SettingsClassHelper
     {
-        public object TheClass { get; set; }
-
-        public SettingsClassHelper()
+        #region constructors
+        internal SettingsClassHelper()
             : this(new HttpContextWrapper(HttpContext.Current))
         {
         }
 
-        public SettingsClassHelper(HttpContext context)
+        internal SettingsClassHelper(HttpContext context)
             : this(new HttpContextWrapper(context))
         {
         }
 
-        public SettingsClassHelper(HttpContextBase httpContext)
+        internal SettingsClassHelper(HttpContextBase httpContext)
         {
             var type = httpContext.ApplicationInstance.GetType();
             while (type != null && type.Namespace == "ASP")
@@ -34,12 +32,10 @@ namespace EasySettings
             if (assembly == null) throw new Exception("Unable to determine executing assembly from HttpContext");
 
 
-            TheClass = (from t in assembly.GetTypes()
-                    where t.BaseType == (typeof(BaseEasySettings)) && t.GetConstructor(Type.EmptyTypes) != null
-                    select (BaseEasySettings)Activator.CreateInstance(t)).Single();
+            TheClass = GetInstanceFromAssembly(assembly);
         }
 
-        public SettingsClassHelper(object obj)
+        internal SettingsClassHelper(object obj)
         {
             if (!obj.GetType().IsSubclassOf(typeof(BaseEasySettings)))
                 throw new ArgumentException("Object does not implement base class", "obj");
@@ -47,7 +43,15 @@ namespace EasySettings
             TheClass = obj;
         }
 
-        public bool IsValidValue(string key, string value)
+        internal SettingsClassHelper(Assembly assembly)
+        {
+            TheClass = GetInstanceFromAssembly(assembly);
+        }
+        #endregion
+
+        internal object TheClass { get; set; }
+
+        internal bool IsValidValue(string key, string value)
         {
             try
             {
@@ -67,9 +71,16 @@ namespace EasySettings
             }
         }
 
-        public PropertyInfo[] GetProperties()
+        internal PropertyInfo[] GetProperties()
         {
             return TheClass.GetType().GetProperties();
+        }
+
+        private static object GetInstanceFromAssembly(Assembly assembly)
+        {
+            return (from t in assembly.GetTypes()
+                    where t.BaseType == (typeof(BaseEasySettings)) && t.GetConstructor(Type.EmptyTypes) != null
+                    select (BaseEasySettings)Activator.CreateInstance(t)).Single();
         }
 
     }

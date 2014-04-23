@@ -1,4 +1,4 @@
-﻿namespace EasySettings.Storage
+﻿namespace EasySettings.SettingsStorage
 {
     using System;
     using System.Collections.Generic;
@@ -6,9 +6,9 @@
     using System.Data.SqlClient;
 
     /// <summary>
-    /// Setting storage using SQL Server. Useful for long term setting storage.
+    /// Setting settingsStorage using SQL Server. Useful for long term setting settingsStorage.
     /// </summary>
-    public class SqlServerStorage : IStorage
+    public class SqlServerSettingsStorage : ISettingsStorage
     {
         /// <summary>
         /// Table name that is used for storing the values
@@ -21,10 +21,10 @@
         private const string TableScript = @"CREATE TABLE [" + TableName + "]([ID] [int] IDENTITY(1,1) NOT NULL,[Key] [varchar](255) NOT NULL,[Value] [varchar](255) NOT NULL,[CreatedOn] [datetime] NOT NULL,[ModifiedOn] [datetime] NOT NULL,CONSTRAINT [PK_EasySettings] PRIMARY KEY CLUSTERED ([ID] ASC) WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]) ON [PRIMARY]";
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="SqlServerStorage"/> class.
+        /// Initializes a new instance of the <see cref="SqlServerSettingsStorage"/> class.
         /// </summary>
         /// <param name="connectionString">The connection string used to connect to the database</param>
-        public SqlServerStorage(string connectionString)
+        public SqlServerSettingsStorage(string connectionString)
         {
             ConnectionString = connectionString;
             Initialize();

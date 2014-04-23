@@ -1,26 +1,32 @@
-﻿namespace EasySettings.Storage
+﻿namespace EasySettings.SettingsStorage
 {
     using System.Collections.Generic;
     using System.Linq;
     using System.Web;
+    using System.Web.SessionState;
 
     /// <summary>
-    /// Setting storage using session storage.
+    /// Setting storage using session settingsStorage.
     /// Suitable for short term, or user based settings. Settings will be lost when user loses session.
     /// </summary>
-    public class HttpSessionStorage : IStorage
+    public class HttpSessionSettingsStorage : ISettingsStorage
     {
         private const string Prefix = "EasySetting";
 
         HttpSessionStateBase _session;
 
-        public HttpSessionStorage()
+        public HttpSessionSettingsStorage()
         {
         }
 
-        public HttpSessionStorage(HttpSessionStateBase session)
+        public HttpSessionSettingsStorage(HttpSessionStateBase session)
         {
             _session = session;
+        }
+
+        public HttpSessionSettingsStorage(HttpSessionState session)
+            : this(new HttpSessionStateWrapper(session))
+        {
         }
 
         protected HttpSessionStateBase Session

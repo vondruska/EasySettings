@@ -4,11 +4,13 @@
 
 namespace EasySettings.Demo.App_Start
 {
+    using SettingsStorage;
+
     public class EasySettingsConfig
     {
         public static void PreStart()
         {
-            Configuration.PersistantSettingsProvider = new Storage.HttpContextStorage();
+            Configuration.SettingsProvider = new HttpContextSettingsStorage();
         }
     }
 }
